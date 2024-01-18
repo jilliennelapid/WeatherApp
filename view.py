@@ -20,3 +20,7 @@ class View(tk.Frame):
 
     def set_controller(self, controller):
         self.controller = controller
+
+    def load_button_clicked(self):
+        if self.controller:
+            self.controller.load(self.location.get())
