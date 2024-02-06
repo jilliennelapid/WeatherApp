@@ -2,13 +2,22 @@ from model import Model
 from view import View
 from controller import Controller
 import tkinter as tk
+from dotenv import load_dotenv
+import os
+
+
+def configure():
+    load_dotenv()
+
 
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Weather App")
 
-        model = Model()
+        api_key = os.getenv('APIkey')
+
+        model = Model(api_key)
         view = View(self)
         controller = Controller(model, view)
 
@@ -19,6 +28,7 @@ class App(tk.Tk):
 
 
 if __name__ == '__main__':
+    configure()
     # Creates an object from class App, which also creates the window using tkinter module
     app = App()
     app.mainloop()

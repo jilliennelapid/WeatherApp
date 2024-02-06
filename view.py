@@ -24,3 +24,19 @@ class View(tk.Frame):
     def load_button_clicked(self):
         if self.controller:
             self.controller.load(self.location.get())
+
+    def set_weather(self):
+
+    def set_temperature(self):
+
+    def set_rain(self):
+
+    def set_windSpeed(self):
+
+    def set_humidity(self):
+
+    def set_sunrise(self):
+
+    def set_sunset(self):
+
+    def set_lastUpdate_time(self):

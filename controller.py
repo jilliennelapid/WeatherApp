@@ -9,9 +9,12 @@ class Controller:
         self.model = model
         self.view = view
 
-
     def load(self, location):
-        try:
-            self.model.location = location
-            self.model.getData()
+        self.model.location = location
+        self.model.callLocation(location)
+
+        self.model.getWeatherData()
+
+
+
 
