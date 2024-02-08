@@ -2,6 +2,7 @@
 # Reflects real world things (e.g. For a Task app, Model would define what a task is).
 
 import requests
+import json
 
 class Model:
     def __init__(self, api_key):
@@ -10,47 +11,47 @@ class Model:
         self.location = None
         self.entry = None
 
-
-
-    def callLocation(self, _location):
+    # rewrite to check location so error can be produced for incorrect place,
+    # remove that check from getWeatherData()
+    """
+    def checkLocation(self, _location):
         cityName = _location
         url = f'https://api.openweathermap.org/geo/1.0/direct?q={cityName},&limit={3}&appid={self.APIkey}'
+
+        response = requests.get(url)
+        data = response.json()
+
+        
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            raise ValueError(f'Invalid Location, please try againHTTP Error: {str(e)}')
+    
+
+        country = data[2:3]
+        print(country)
+        lat = data["lat"]
+        lon = data["lon"]
+
+        self.getWeatherData(country, lat, lon)
+        
+    """
+
+    def getWeatherData(self, _location):
+        url = f'https://api.openweathermap.org/data/2.5/weather?q={_location}&appid={self.APIkey}'
 
         response = requests.get(url)
 
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            return "Error: " + str(e) + "\nEnter a new location."        # Might need to rewrite to display in GUI
-        else:
-            data = response.json()
+            raise ValueError(f'Invalid Location, please try again HTTP Error: {str(e)}')
 
-        country = data['state']
-        lat = data['lat']
-        lon = data['lon']
+        data = response.json()
 
-        self.getWeatherData(country, lat, lon)
+        # print(data)
 
-    def getWeatherData(self, _country, _lat, _lon):
-        country = _country
-        lat = _lat
-        lon = _lon
-
-
-        url = f'https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={self.APIkey}'
-
-        res = requests.get(url)
-        data = res.json()
-
-        weather = data['weather']['description']
-        temperature = data['main']['temp']
-        temp_min = data['main']['temp_min']
-        temp_min = data['main']['temp_max']
-        rain = data['rain']
-        wind_speed = data['wind']['speed']
-        humidity = data['main']['humidity']
-        sunrise = data['sys']['sunrise']
-        sunset = data['sunset']
+        return data
 
 
 

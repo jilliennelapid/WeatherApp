@@ -26,7 +26,6 @@ class App(tk.Tk):
         View.set_controller(view, controller)
 
 
-
 if __name__ == '__main__':
     configure()
     # Creates an object from class App, which also creates the window using tkinter module
