@@ -13,43 +13,39 @@ class Model:
 
     # rewrite to check location so error can be produced for incorrect place,
     # remove that check from getWeatherData()
-    """
     def checkLocation(self, _location):
-        cityName = _location
-        url = f'https://api.openweathermap.org/geo/1.0/direct?q={cityName},&limit={3}&appid={self.APIkey}'
+        location_name, country_name = _location.split(', ')
+        print(location_name + "\n" + country_name)
+
+        url = f'https://api.openweathermap.org/geo/1.0/direct?q={location_name},&limit={5}&appid={self.APIkey}'
 
         response = requests.get(url)
-        data = response.json()
-
         
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            raise ValueError(f'Invalid Location, please try againHTTP Error: {str(e)}')
-    
-
-        country = data[2:3]
-        print(country)
-        lat = data["lat"]
-        lon = data["lon"]
-
-        self.getWeatherData(country, lat, lon)
-        
-    """
-
-    def getWeatherData(self, _location):
-        url = f'https://api.openweathermap.org/data/2.5/weather?q={_location}&appid={self.APIkey}'
-
-        response = requests.get(url)
-
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             raise ValueError(f'Invalid Location, please try again HTTP Error: {str(e)}')
+        else:
+            data = response.json()
+
+        lat = lon = 0
+
+        for location in data:
+            if location['state'] == country_name:
+                lat = location["lat"]
+                lon = location["lon"]
+                break
+
+        return lat, lon
+
+    def getWeatherData(self, _lat, _lon):
+        url = f'https://api.openweathermap.org/data/2.5/weather?lat={_lat}&lon={_lon}&appid={self.APIkey}&units=imperial'
+
+        response = requests.get(url)
 
         data = response.json()
 
-        # print(data)
+        print(data)
 
         return data
 

@@ -1,14 +1,14 @@
 from model import Model
 from view import View
+
 from controller import Controller
-import tkinter as tk
 from dotenv import load_dotenv
+import tkinter as tk
 import os
 
 
 def configure():
     load_dotenv()
-
 
 class App(tk.Tk):
     def __init__(self):

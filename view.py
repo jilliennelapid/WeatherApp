@@ -1,8 +1,9 @@
 # The View defines the code for the display or features that the
 # user interacts with.
+import customtkinter as ctk
 import tkinter as tk
 from tkinter import ttk
-
+from datetime import datetime
 
 class View(tk.Frame):
     def __init__(self, parent):
@@ -17,7 +18,7 @@ class View(tk.Frame):
         self.location_search = ttk.Entry(self, textvariable=self.location, width=30)
         self.location_search.grid(row=0, column=1, sticky=tk.NSEW)
 
-        self.save_button = ttk.Button(self, text='Search', command=self.search_button_clicked)
+        self.save_button = ctk.CTkButton(self, corner_radius=10, text='Search', command=self.search_button_clicked)
         self.save_button.grid(row=0, column=2, padx=10)
 
         self.status_label = ttk.Label(self, text='', foreground='yellow')
@@ -82,20 +83,16 @@ class View(tk.Frame):
         self.weather_label['text'] = weather
 
     def set_temperature(self, data):
-        temperature = data['main']['temp']
-        converted_temp = int(((temperature - 273.15) * (9/5) + 32))
-        self.temperature_label['text'] = converted_temp
+        temperature = int(data['main']['temp'])
+        self.temperature_label['text'] = temperature
 
     def set_temp_min(self, data):
-        temp_min = data['main']['temp_min']
-        converted_temp = int(((temp_min - 273.15) * (9 / 5) + 32))
-        self.temp_min_label['text'] = converted_temp
+        temp_min = int(data['main']['temp_min'])
+        self.temp_min_label['text'] = temp_min
 
     def set_temp_max(self, data):
-        temp_max = data['main']['temp_max']
-        converted_temp = int(((temp_max - 273.15) * (9 / 5) + 32))
-        self.temp_max_label['text'] = converted_temp
-
+        temp_max = int(data['main']['temp_max'])
+        self.temp_max_label['text'] = temp_max
 
     def set_rain(self, data):
         try:
@@ -115,10 +112,16 @@ class View(tk.Frame):
 
     def set_sunrise(self, data):
         sunrise = data['sys']['sunrise']
-        self.sunrise_label['text'] = sunrise
+
+        convertedTime = datetime.fromtimestamp(sunrise)
+
+        self.sunrise_label['text'] = convertedTime
 
     def set_sunset(self, data):
         sunset = data['sys']['sunset']
-        self.sunset_label['text'] = sunset
+
+        convertedTime = datetime.fromtimestamp(sunset)
+
+        self.sunset_label['text'] = convertedTime
 
     # def set_lastUpdate_time(self):
