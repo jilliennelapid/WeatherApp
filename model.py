@@ -2,7 +2,6 @@
 # Reflects real world things (e.g. For a Task app, Model would define what a task is).
 
 import requests
-import json
 
 class Model:
     def __init__(self, api_key):
@@ -11,11 +10,8 @@ class Model:
         self.location = None
         self.entry = None
 
-    # rewrite to check location so error can be produced for incorrect place,
-    # remove that check from getWeatherData()
     def checkLocation(self, _location):
         location_name, country_name = _location.split(', ')
-        print(location_name + "\n" + country_name)
 
         url = f'https://api.openweathermap.org/geo/1.0/direct?q={location_name},&limit={5}&appid={self.APIkey}'
 
@@ -42,10 +38,9 @@ class Model:
         url = f'https://api.openweathermap.org/data/2.5/weather?lat={_lat}&lon={_lon}&appid={self.APIkey}&units=imperial'
 
         response = requests.get(url)
-
         data = response.json()
 
-        print(data)
+        # print(data)
 
         return data
 

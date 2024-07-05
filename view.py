@@ -9,52 +9,72 @@ class View(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.label = ttk.Label(self, text='Enter a Location:')
+        # Search Bar Frame
+        self.search_bar_frame = ttk.Frame(parent, width=500, height=100)
+        self.search_bar_frame.grid(row=0, column=0, padx=30, pady=10)
+
+        self.label = ttk.Label(self.search_bar_frame, text='Enter a Location:')
         self.label.grid(row=0, column=0)
 
-        # Initializes the variable locations as a tkinter string variable
         self.location = tk.StringVar()
-        # (frame, variable entry is saved to, size)
-        self.location_search = ttk.Entry(self, textvariable=self.location, width=30)
+        self.location_search = ttk.Entry(self.search_bar_frame, textvariable=self.location, width=35, foreground='gray')
         self.location_search.grid(row=0, column=1, sticky=tk.NSEW)
 
-        self.save_button = ctk.CTkButton(self, corner_radius=10, text='Search', command=self.search_button_clicked)
-        self.save_button.grid(row=0, column=2, padx=10)
+        self.location_search.insert(0, 'Enter a location as: "Location, Country/State"')
+        self.location_search.bind('<FocusIn>', self.on_entry_click)
+        self.location_search.bind('<Return>', self.on_enter_pressed)
 
-        self.status_label = ttk.Label(self, text='', foreground='yellow')
+        self.search_button = ctk.CTkButton(self.search_bar_frame, corner_radius=10, text='Search',
+                                           command=self.search_button_clicked, fg_color="#5989d7",
+                                           hover_color="#496fae")
+        self.search_button.grid(row=0, column=2, padx=30)
+
+        self.status_label = ttk.Label(self.search_bar_frame, text='', foreground='yellow')
         self.status_label.grid(row=1, column=1, sticky=tk.W)
 
-        self.weather_label = ttk.Label(self, text='')
+        # Weather Data Frame
+        self.info_widgets_frame = ttk.Frame(parent, width=500, height=200)
+        self.info_widgets_frame.grid(row=2, column=0, padx=30, pady=30)
+
+        self.weather_label = ttk.Label(self.info_widgets_frame, text='')
         self.weather_label.grid(row=2, column=1, sticky=tk.W)
 
-        self.temperature_label = ttk.Label(self, text='')
+        self.temperature_label = ttk.Label(self.info_widgets_frame, text='')
         self.temperature_label.grid(row=3, column=1, sticky=tk.W)
 
-        self.temp_min_label = ttk.Label(self, text='')
+        self.temp_min_label = ttk.Label(self.info_widgets_frame, text='')
         self.temp_min_label.grid(row=3, column=2, sticky=tk.W)
 
-        self.temp_max_label = ttk.Label(self, text='')
+        self.temp_max_label = ttk.Label(self.info_widgets_frame, text='')
         self.temp_max_label.grid(row=4, column=1, sticky=tk.W)
 
-        self.rain_label = ttk.Label(self, text='')
+        self.rain_label = ttk.Label(self.info_widgets_frame, text='')
         self.rain_label.grid(row=4, column=2, sticky=tk.W)
 
-        self.wind_speed_label = ttk.Label(self, text='')
+        self.wind_speed_label = ttk.Label(self.info_widgets_frame, text='')
         self.wind_speed_label.grid(row=5, column=1, sticky=tk.W)
 
-        self.humidity_label= ttk.Label(self, text='')
+        self.humidity_label= ttk.Label(self.info_widgets_frame, text='')
         self.humidity_label.grid(row=5, column=2, sticky=tk.W)
 
-        self.sunrise_label = ttk.Label(self, text='')
+        self.sunrise_label = ttk.Label(self.info_widgets_frame, text='')
         self.sunrise_label.grid(row=6, column=1, sticky=tk.W)
 
-        self.sunset_label = ttk.Label(self, text='')
+        self.sunset_label = ttk.Label(self.info_widgets_frame, text='')
         self.sunset_label.grid(row=6, column=2, sticky=tk.W)
 
         self.controller = None
 
     def set_controller(self, controller):
         self.controller = controller
+
+    def on_entry_click(self, event):
+        self.location_search.delete(0, "end")  # delete all the text in the entry
+        self.location_search['foreground'] = 'white'
+
+    def on_enter_pressed(self, event):
+        if self.controller:
+            self.controller.load(self.location.get())
 
     def search_button_clicked(self):
         if self.controller:
