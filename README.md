@@ -1,5 +1,5 @@
 # WeatherApp
-WeatherApp is a Python program able to display weather data for a desired city/town in a certain country.
+WeatherApp is a Python program in development meant to display weather data for a desired city/town in a certain country.
 
 The program makes use of `tkinter` and `customtkinter` to build the GUI, [OpenWeather](https://openweathermap.org) API for the weather data, and model-view-controller for the code organization.
 
