@@ -9,32 +9,53 @@ class View(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
+        # Main Menu Options Frame
+        self.main_menu_frame = ttk.Frame(parent, width=250, height=100)
+        self.main_menu_frame.grid(row=0, column=0, padx=30, pady=10)
+
+        self.search_button = ctk.CTkButton(self.main_menu_frame, corner_radius=10, text='Saved Locations',
+                                           command=self.saved_locations_button_clicked, fg_color="#5989d7", hover_color="#496fae")
+        self.search_button.grid(row=0, column=0, padx=50, pady=10)
+
+        self.search_button = ctk.CTkButton(self.main_menu_frame, corner_radius=10, text='Settings',
+                                           command=self.settings_button_clicked, fg_color="#5989d7", hover_color="#496fae")
+        self.search_button.grid(row=1, column=0, padx=50, pady=10)
+
+        """
+        self.unit_select = ctk.CTkOptionMenu(self.main_menu_frame, values=['Fahrenheit', 'Celsius', 'Kelvin'])
+        self.unit_select.grid(row=0, column=1, padx=30, pady=10)
+        """
+
         # Search Bar Frame
-        self.search_bar_frame = ttk.Frame(parent, width=500, height=100)
-        self.search_bar_frame.grid(row=0, column=0, padx=30, pady=10)
+        self.search_bar_frame = ttk.Frame(parent, width=500, height=70)
+        self.search_bar_frame.grid(row=3, column=0, padx=30, pady=30)
 
         self.label = ttk.Label(self.search_bar_frame, text='Enter a Location:')
-        self.label.grid(row=0, column=0)
+        self.label.grid(row=1, column=0)
 
         self.location = tk.StringVar()
-        self.location_search = ttk.Entry(self.search_bar_frame, textvariable=self.location, width=35, foreground='gray')
-        self.location_search.grid(row=0, column=1, sticky=tk.NSEW)
+        self.location_search = ttk.Entry(self.search_bar_frame, textvariable=self.location, width=45, foreground='gray')
+        self.location_search.grid(row=1, column=1, sticky=tk.NSEW, padx=10)
 
-        self.location_search.insert(0, 'Enter a location as: "Location, Country/State"')
+        self.location_search.insert(0, 'City Name, State/Country')
         self.location_search.bind('<FocusIn>', self.on_entry_click)
         self.location_search.bind('<Return>', self.on_enter_pressed)
 
         self.search_button = ctk.CTkButton(self.search_bar_frame, corner_radius=10, text='Search',
                                            command=self.search_button_clicked, fg_color="#5989d7",
                                            hover_color="#496fae")
-        self.search_button.grid(row=0, column=2, padx=30)
+        self.search_button.grid(row=1, column=3, padx=40)
 
-        self.status_label = ttk.Label(self.search_bar_frame, text='', foreground='yellow')
+        self.status_label = ttk.Label(self.search_bar_frame, text='', foreground='red')
         self.status_label.grid(row=1, column=1, sticky=tk.W)
+
 
         # Weather Data Frame
         self.info_widgets_frame = ttk.Frame(parent, width=500, height=200)
         self.info_widgets_frame.grid(row=2, column=0, padx=30, pady=30)
+
+        self.location_label = ttk.Label(self.info_widgets_frame, text="")
+        self.location_label.grid(row=1, column=1, sticky=tk.W)
 
         self.weather_label = ttk.Label(self.info_widgets_frame, text='')
         self.weather_label.grid(row=2, column=1, sticky=tk.W)
@@ -70,7 +91,7 @@ class View(tk.Frame):
 
     def on_entry_click(self, event):
         self.location_search.delete(0, "end")  # delete all the text in the entry
-        self.location_search['foreground'] = 'white'
+        self.location_search['foreground'] = 'black'
 
     def on_enter_pressed(self, event):
         if self.controller:
@@ -79,6 +100,12 @@ class View(tk.Frame):
     def search_button_clicked(self):
         if self.controller:
             self.controller.load(self.location.get())
+
+    def saved_locations_button_clicked(self):
+        return
+
+    def settings_button_clicked(self):
+        return
 
     def show_message(self, message):
         self.status_label['text'] = message
@@ -97,6 +124,10 @@ class View(tk.Frame):
         :return:
         """
         self.status_label['text'] = ''
+
+    def set_location_name(self, data):
+        location = data['name']
+        self.location_label['text'] = location
 
     def set_weather(self, data):
         weather = data['weather'][0]['description']
