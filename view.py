@@ -3,6 +3,7 @@
 import customtkinter as ctk
 from datetime import datetime
 from PIL import Image
+import json
 
 class View(ctk.CTkFrame):
     def __init__(self, parent):
@@ -50,15 +51,17 @@ class MainView(ctk.CTkFrame):
         self.main_icon = ctk.CTkLabel(self.main_menu_frame, image=self.main_icon_img, text="")
         self.main_icon.grid(row=0, column=0, rowspan=2, padx=30, pady=10, sticky="nsew")
 
-        self.saved_locations_button_img = ctk.CTkImage(light_image=Image.open("images/saved-locations-icon-img.png"),
-                                                       size=(205, 42))
+        self.saved_locations_button_img = ctk.CTkImage(light_image=Image.open("images/saved-locations-icon-light.png"),
+                                                       dark_image=Image.open("images/saved-locations-icon-dark.png"),
+                                                       size=(195, 42))
         self.saved_locations_button = ctk.CTkButton(self.main_menu_frame, corner_radius=10, image=self.saved_locations_button_img,
                                                     text="", command=lambda:view_control.show_frame(SavedView),
                                                     fg_color="transparent", hover=False)
         self.saved_locations_button.grid(row=0, column=1, padx=30, pady=10)
 
-        self.settings_button_img = ctk.CTkImage(light_image=Image.open("images/settings-icon-img.png"),
-                                                size=(205, 42))
+        self.settings_button_img = ctk.CTkImage(light_image=Image.open("images/settings-icon-light.png"),
+                                                dark_image=Image.open("images/settings-icon-dark.png"),
+                                                size=(195, 42))
         self.settings_button = ctk.CTkButton(self.main_menu_frame, corner_radius=10, image=self.settings_button_img,
                                              text="", command=lambda:view_control.show_frame(SettingsView),
                                              fg_color="transparent", hover=False)
@@ -212,21 +215,132 @@ class StatsView(ctk.CTkFrame):
 
     # def set_lastUpdate_time(self):
 
-
-class SettingsView(ctk.CTkFrame):
-    def __init__(self, parent, view_control):
-        ctk.CTkFrame.__init__(self, parent)
-
-        self.label = ctk.CTkLabel(self, text="Settings View")
-        self.label.grid(row=0, column=4, padx=10, pady=10)
-        #self.settings_menu = ctk.CTkFrame(parent)
-
-
 class SavedView(ctk.CTkFrame):
     def __init__(self, parent, view_control):
         ctk.CTkFrame.__init__(self, parent)
 
-        self.label = ctk.CTkLabel(self, text="Saved View")
-        self.label.grid(row=0, column=4, padx=10, pady=10)
+        self.label = ctk.CTkLabel(self, text="Saved View", font=("Arial", 16, "bold"))
+        self.label.grid(row=0, column=0, padx=10, pady=10)
 
+        self.return_button = ctk.CTkButton(self, corner_radius=10, text='Return to Home',
+                                           command=lambda: view_control.show_frame(MainView), fg_color="#5989d7",
+                                           hover_color="#496fae")
+        self.return_button.grid(row=1, column=0, padx=40)
+
+        #ctk.set_appearance_mode("Dark")
         #self.saved_menu = ctk.CTkFrame(parent)
+
+class SettingsView(ctk.CTkFrame):
+    def __init__(self, parent, view_control):
+        ctk.CTkFrame.__init__(self, parent)
+        self.use_sys_mode = ctk.IntVar()
+        self.night_mode = ctk.IntVar()
+
+        self.pull_setting_pref()
+
+        # Label of the Frame
+        self.frame_label = ctk.CTkLabel(self, text="Settings View", font=("Arial", 16, "bold"))
+        self.frame_label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+
+        # 1) System/Manual Mode Toggle - Label
+        self.mode_label = ctk.CTkLabel(self, text="Use System Default Mode", font=("Arial", 14))
+        self.mode_label.grid(row=1, column=1, padx=10, pady=10, sticky="w")
+
+        # 1) System/Manual Mode Toggle - Check Box
+        self.mode_toggle = ctk.CTkCheckBox(self, text="", command=self.set_sys_mode, variable=self.use_sys_mode,
+                                           onvalue=1, offvalue=0)
+        self.mode_toggle.grid(row=1, column=2, padx=40, pady=20, sticky="w")
+
+        # 2) Light/Dark Mode Toggle - Label
+        self.toggle_label = ctk.CTkLabel(self, text="Theme Toggle", font=("Arial", 14))
+        self.toggle_label.grid(row=2, column=1, padx=10, pady=10, sticky="w")
+
+        # 2) Light/Dark Mode Toggle - Switch
+        self.mode_switch = ctk.CTkSwitch(self, width=10, height=10, text="", command=self.set_dark_mode,
+                                         variable=self.night_mode, onvalue=1, offvalue=0)
+        self.mode_switch.grid(row=2, column=2, padx=40, pady=20, sticky="w")
+
+        self.grid_columnconfigure(2, weight=1)
+
+        # Return to Home Button
+        self.return_button = ctk.CTkButton(self, corner_radius=10, text='Return to Home',
+                                           command=lambda:view_control.show_frame(MainView), fg_color="#5989d7",
+                                           hover_color="#496fae")
+        self.return_button.grid(row=5, column=2, columnspan=2, padx=40, pady=20, sticky="e")
+
+
+        self.set_widget_state()
+        #self.settings_menu = ctk.CTkFrame(parent)
+
+
+    def pull_setting_pref(self):
+        file_path = "data/settings.json"
+
+        try:
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+
+            self.use_sys_mode.set(int(data['system_mode']['in_use']))
+            self.night_mode.set(int(data['night_mode']['in_use']))
+
+        except FileNotFoundError:
+            print(f"Error: The file {file_path} was not found.")
+
+        except json.JSONDecodeError as e:
+            print(f"Error: Failed to decode JSON from the file {file_path}: {e}.")
+
+    def set_widget_state(self):
+        if self.use_sys_mode.get() == 1:
+            ctk.set_appearance_mode("System")
+            self.mode_switch.configure(state="disabled")
+
+        elif self.use_sys_mode.get() == 0:
+            if self.night_mode.get() == 0:
+                ctk.set_appearance_mode("Light")
+
+            elif self.night_mode.get() == 1:
+                ctk.set_appearance_mode("Dark")
+
+            self.mode_switch.configure(state="normal")
+
+    def set_sys_mode(self):
+        if self.use_sys_mode.get() == 1:
+            ctk.set_appearance_mode("System")
+            self.update_json("system_mode", 1)
+            self.mode_switch.configure(state="disabled")
+
+        elif self.use_sys_mode.get() == 0:
+            self.mode_switch.configure(state="normal")
+            self.update_json("system_mode", 0)
+            self.set_dark_mode()
+
+    def set_dark_mode(self):
+        if self.night_mode.get() == 1:
+            ctk.set_appearance_mode("Dark")
+            self.update_json("night_mode", self.night_mode.get())
+
+        elif self.night_mode.get() == 0:
+            ctk.set_appearance_mode("Light")
+            self.update_json("night_mode", self.night_mode.get())
+
+    def update_json(self, field, new_value):
+        file_path = "data/settings.json"
+
+        try:
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+
+        except FileNotFoundError:
+            print(f"Error: The file {file_path} was not found.")
+
+        except json.JSONDecodeError as e:
+            print(f"Error: Failed to decode JSON from the file {file_path}: {e}.")
+
+        data[field]['in_use'] = new_value
+
+        try:
+            with open(file_path, 'w') as file:
+                json.dump(data, file, indent=4)
+
+        except IOError as e:
+            print(f"Error writing to {file_path}: {e}")
