@@ -51,16 +51,16 @@ class MainView(ctk.CTkFrame):
         self.main_icon = ctk.CTkLabel(self.main_menu_frame, image=self.main_icon_img, text="")
         self.main_icon.grid(row=0, column=0, rowspan=2, padx=30, pady=10, sticky="nsew")
 
-        self.saved_locations_button_img = ctk.CTkImage(light_image=Image.open("images/saved-locations-icon-light.png"),
-                                                       dark_image=Image.open("images/saved-locations-icon-dark.png"),
+        self.saved_locations_button_img = ctk.CTkImage(dark_image=Image.open("images/saved-locations-icon-light.png"),
+                                                       light_image=Image.open("images/saved-locations-icon-dark.png"),
                                                        size=(195, 42))
         self.saved_locations_button = ctk.CTkButton(self.main_menu_frame, corner_radius=10, image=self.saved_locations_button_img,
                                                     text="", command=lambda:view_control.show_frame(SavedView),
                                                     fg_color="transparent", hover=False)
         self.saved_locations_button.grid(row=0, column=1, padx=30, pady=10)
 
-        self.settings_button_img = ctk.CTkImage(light_image=Image.open("images/settings-icon-light.png"),
-                                                dark_image=Image.open("images/settings-icon-dark.png"),
+        self.settings_button_img = ctk.CTkImage(dark_image=Image.open("images/settings-icon-light.png"),
+                                                light_image=Image.open("images/settings-icon-dark.png"),
                                                 size=(195, 42))
         self.settings_button = ctk.CTkButton(self.main_menu_frame, corner_radius=10, image=self.settings_button_img,
                                              text="", command=lambda:view_control.show_frame(SettingsView),
@@ -68,15 +68,15 @@ class MainView(ctk.CTkFrame):
         self.settings_button.grid(row=1, column=1, padx=30, pady=10)
 
         # Search Bar Frame
-        self.search_bar_frame = ctk.CTkFrame(parent, fg_color="transparent")
-        self.search_bar_frame.grid(row=3, column=0, padx=30, pady=(0, 30))
+        self.search_bar_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.search_bar_frame.grid(row=3, column=0, padx=30, pady=(50,30))
 
         self.label = ctk.CTkLabel(self.search_bar_frame, text='Enter a Location:')
-        self.label.grid(row=1, column=0)
+        self.label.grid(row=1, column=0, padx=(0,5))
 
         self.location = ctk.StringVar()
-        self.location_search = ctk.CTkEntry(self.search_bar_frame, textvariable=self.location, width=200)
-        self.location_search.grid(row=1, column=1, sticky='nsew', padx=10)
+        self.location_search = ctk.CTkEntry(self.search_bar_frame, textvariable=self.location, width=225)
+        self.location_search.grid(row=1, column=1, padx=(7,10), sticky='e')
 
         self.location_search.insert(0, 'City Name, State/Country')
         self.location_search.bind('<FocusIn>', self.on_entry_click)
@@ -85,7 +85,7 @@ class MainView(ctk.CTkFrame):
         self.search_button = ctk.CTkButton(self.search_bar_frame, corner_radius=10, text='Search',
                                            command=self.search_button_clicked, fg_color="#5989d7",
                                            hover_color="#496fae")
-        self.search_button.grid(row=1, column=3, padx=40)
+        self.search_button.grid(row=1, column=2, padx=(20, 0), sticky='e')
 
         self.status_label = ctk.CTkLabel(self.search_bar_frame, text='')
         self.status_label.grid(row=1, column=1, sticky=ctk.W)
@@ -219,16 +219,48 @@ class SavedView(ctk.CTkFrame):
     def __init__(self, parent, view_control):
         ctk.CTkFrame.__init__(self, parent)
 
-        self.label = ctk.CTkLabel(self, text="Saved View", font=("Arial", 16, "bold"))
-        self.label.grid(row=0, column=0, padx=10, pady=10)
+        self.frame_label = ctk.CTkLabel(self, text="Saved Locations", font=("Arial", 20, "bold"))
+        self.frame_label.grid(row=0, column=0, padx=20, pady=10, sticky="w")
 
+        # Return to Home Button
         self.return_button = ctk.CTkButton(self, corner_radius=10, text='Return to Home',
                                            command=lambda: view_control.show_frame(MainView), fg_color="#5989d7",
                                            hover_color="#496fae")
-        self.return_button.grid(row=1, column=0, padx=40)
+        self.return_button.grid(row=0, column=1, padx=20, pady=20, sticky="e")
 
-        #ctk.set_appearance_mode("Dark")
-        #self.saved_menu = ctk.CTkFrame(parent)
+        self.list_of_saved = ctk.CTkScrollableFrame(self, width=625, height=80)
+        self.list_of_saved.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
+
+        self.pull_saved_locations()
+
+    # Things to add/look into:
+    # Hovering over location will show options to delete the location
+    # Hovering over location will change its color
+    # Clicking on
+    def pull_saved_locations(self):
+        file_path = 'data/saved_locations.json'
+
+        try:
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+
+        except FileNotFoundError:
+            print(f"Error: The file {file_path} was not found.")
+
+        except json.JSONDecodeError as e:
+            print(f"Error: Failed to decode JSON from the file {file_path}: {e}.")
+
+
+        if len(data['saved_locations']) == 0:
+            no_location_label = ctk.CTkLabel(self.list_of_saved, text="No Saved Locations.")
+            no_location_label.grid(row=0, column=0, padx=40, pady=10, sticky='nsew')
+
+        else:
+            for i in range(len(data['saved_locations'])):
+                location_text = data['saved_locations'][i]['location_name'] + ", " + data['saved_locations'][i]['country_name']
+                location_label = ctk.CTkLabel(self.list_of_saved, text=f"{location_text}")
+                location_label.grid(row=i, column=0, padx=40, pady=10, sticky='w')
+
 
 class SettingsView(ctk.CTkFrame):
     def __init__(self, parent, view_control):
@@ -239,8 +271,15 @@ class SettingsView(ctk.CTkFrame):
         self.pull_setting_pref()
 
         # Label of the Frame
-        self.frame_label = ctk.CTkLabel(self, text="Settings View", font=("Arial", 16, "bold"))
-        self.frame_label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        self.frame_label = ctk.CTkLabel(self, text="Settings View", font=("Arial", 20, "bold"))
+        self.frame_label.grid(row=0, column=0, padx=20, pady=10, sticky="w")
+
+        # Return to Home Button
+        self.return_button = ctk.CTkButton(self, corner_radius=10, text='Return to Home',
+                                           command=lambda: view_control.show_frame(MainView), fg_color="#5989d7",
+                                           hover_color="#496fae")
+        self.return_button.grid(row=0, column=1, columnspan=2, padx=20, pady=20, sticky="e")
+
 
         # 1) System/Manual Mode Toggle - Label
         self.mode_label = ctk.CTkLabel(self, text="Use System Default Mode", font=("Arial", 14))
@@ -261,13 +300,6 @@ class SettingsView(ctk.CTkFrame):
         self.mode_switch.grid(row=2, column=2, padx=40, pady=20, sticky="w")
 
         self.grid_columnconfigure(2, weight=1)
-
-        # Return to Home Button
-        self.return_button = ctk.CTkButton(self, corner_radius=10, text='Return to Home',
-                                           command=lambda:view_control.show_frame(MainView), fg_color="#5989d7",
-                                           hover_color="#496fae")
-        self.return_button.grid(row=5, column=2, columnspan=2, padx=40, pady=20, sticky="e")
-
 
         self.set_widget_state()
         #self.settings_menu = ctk.CTkFrame(parent)
