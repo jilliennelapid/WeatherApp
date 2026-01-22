@@ -37,6 +37,9 @@ class View(ctk.CTkFrame):
 
     def set_controller(self, controller):
         self.controller = controller
+        self.frames[MainView].set_controller(self.controller)
+        self.frames[StatsView].set_controller(self.controller)
+        self.frames[SavedView].set_controller(self.controller)
 
 class MainView(ctk.CTkFrame):
     def __init__(self, parent, view_control):
@@ -46,6 +49,7 @@ class MainView(ctk.CTkFrame):
         self.main_menu_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.main_menu_frame.grid(row=0, column=0, sticky='nsew', padx=30, pady=10)
         self.main_menu_frame.grid_columnconfigure(0, weight=1)
+        self.main_menu_frame.bind("<Button-1>", lambda y, w=self.main_menu_frame: self.leave_entry(w))
 
         self.main_icon_img = ctk.CTkImage(light_image=Image.open("images/main-app-icon.png"), size=(265, 130))
         self.main_icon = ctk.CTkLabel(self.main_menu_frame, image=self.main_icon_img, text="")
@@ -63,7 +67,7 @@ class MainView(ctk.CTkFrame):
                                                 light_image=Image.open("images/settings-icon-dark.png"),
                                                 size=(195, 42))
         self.settings_button = ctk.CTkButton(self.main_menu_frame, corner_radius=10, image=self.settings_button_img,
-                                             text="", command=lambda:view_control.show_frame(SettingsView),
+                                             text="", command=lambda:view_control.show_frame(StatsView),
                                              fg_color="transparent", hover=False)
         self.settings_button.grid(row=1, column=1, padx=30, pady=10)
 
@@ -79,8 +83,8 @@ class MainView(ctk.CTkFrame):
         self.location_search.grid(row=1, column=1, padx=(7,10), sticky='e')
 
         self.location_search.insert(0, 'City Name, State/Country')
-        self.location_search.bind('<FocusIn>', self.on_entry_click)
-        self.location_search.bind('<Return>', self.search_button_clicked)
+        self.location_search.bind("<FocusIn>", lambda y, w=self.location_search: self.on_entry_click(w))
+        self.location_search.bind("<Return>", self.search_button_clicked)
 
         self.search_button = ctk.CTkButton(self.search_bar_frame, corner_radius=10, text='Search',
                                            command=self.search_button_clicked, fg_color="#5989d7",
@@ -95,9 +99,12 @@ class MainView(ctk.CTkFrame):
     def set_controller(self, controller):
         self.controller = controller
 
-    def on_entry_click(self, event):
-        self.location_search.delete(0, "end")  # delete all the text in the entry
-        self.location_search['foreground'] = 'black'
+    def on_entry_click(self, widget):
+        widget.delete(0, "end")  # delete all the text in the entry
+        widget['foreground'] = 'black'
+
+    def leave_entry(self, widget):
+        widget.focus_set()
 
     # Begins the Search Logic upon clicking 'Search' or pressing enter
     def search_button_clicked(self):
@@ -119,44 +126,47 @@ class StatsView(ctk.CTkFrame):
         ctk.CTkFrame.__init__(self, parent)
 
         # Weather Data Frame
-        self.info_widgets_frame = ctk.CTkFrame(self)
+        self.info_widgets_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.info_widgets_frame.grid(row=0, column=0, stick='nsew')
+
+        self.frame_label = ctk.CTkLabel(self.info_widgets_frame, text="Temp Name", font=("Arial", 20, "bold"))
+        self.frame_label.grid(row=0, column=0, padx=20, pady=10, sticky="w")
 
         # Location Name
         self.location_label = ctk.CTkLabel(self.info_widgets_frame, text="")
-        self.location_label.grid(row=0, column=1, sticky=ctk.W)
+        self.location_label.grid(row=0, column=1, sticky="w")
 
         # Temperature (in degrees)
         self.temperature_label = ctk.CTkLabel(self.info_widgets_frame, text='')
-        self.temperature_label.grid(row=1, column=1, sticky=ctk.W)
+        self.temperature_label.grid(row=1, column=1, sticky="w")
 
         # Label of Weather Type
         self.weather_label = ctk.CTkLabel(self.info_widgets_frame, text='')
-        self.weather_label.grid(row=2, column=1, sticky=ctk.W)
+        self.weather_label.grid(row=2, column=1, sticky="w")
 
         # Lowest Temperature for the Day
         self.temp_min_label = ctk.CTkLabel(self.info_widgets_frame, text='')
-        self.temp_min_label.grid(row=1, column=2, sticky=ctk.W)
+        self.temp_min_label.grid(row=1, column=2, sticky="w")
 
         self.temp_min_value = ctk.CTkLabel(self.info_widgets_frame, text='')
-        self.temp_min_value.grid(row=4, column=0, sticky=ctk.W)
+        self.temp_min_value.grid(row=4, column=0, sticky="w")
         self.temp_max_label = ctk.CTkLabel(self.info_widgets_frame, text='')
-        self.temp_max_label.grid(row=4, column=1, sticky=ctk.W)
+        self.temp_max_label.grid(row=4, column=1, sticky="w")
 
         self.rain_label = ctk.CTkLabel(self.info_widgets_frame, text='')
-        self.rain_label.grid(row=4, column=2, sticky=ctk.W)
+        self.rain_label.grid(row=4, column=2, sticky="w")
 
         self.wind_speed_label = ctk.CTkLabel(self.info_widgets_frame, text='')
-        self.wind_speed_label.grid(row=5, column=1, sticky=ctk.W)
+        self.wind_speed_label.grid(row=5, column=1, sticky="w")
 
         self.humidity_label= ctk.CTkLabel(self.info_widgets_frame, text='')
-        self.humidity_label.grid(row=5, column=2, sticky=ctk.W)
+        self.humidity_label.grid(row=5, column=2, sticky="w")
 
         self.sunrise_label = ctk.CTkLabel(self.info_widgets_frame, text='')
-        self.sunrise_label.grid(row=6, column=1, sticky=ctk.W)
+        self.sunrise_label.grid(row=6, column=1, sticky="w")
 
         self.sunset_label = ctk.CTkLabel(self.info_widgets_frame, text='')
-        self.sunset_label.grid(row=6, column=2, sticky=ctk.W)
+        self.sunset_label.grid(row=6, column=2, sticky="w")
 
         self.controller = None
 
@@ -164,8 +174,7 @@ class StatsView(ctk.CTkFrame):
         self.controller = controller
 
     def set_location_name(self, data):
-        location = data['name']
-        self.location_label['text'] = location
+        self.location_label.configure(text=f"{data}")
 
     def set_weather(self, data):
         weather = data['weather'][0]['description']
@@ -231,12 +240,16 @@ class SavedView(ctk.CTkFrame):
         self.list_of_saved = ctk.CTkScrollableFrame(self, width=625, height=80)
         self.list_of_saved.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
 
+        self.controller = None
         self.pull_saved_locations()
 
     # Things to add/look into:
     # Hovering over location will show options to delete the location
     # Hovering over location will change its color
     # Clicking on
+    def set_controller(self, controller):
+        self.controller = controller
+
     def pull_saved_locations(self):
         file_path = 'data/saved_locations.json'
 
@@ -258,8 +271,25 @@ class SavedView(ctk.CTkFrame):
         else:
             for i in range(len(data['saved_locations'])):
                 location_text = data['saved_locations'][i]['location_name'] + ", " + data['saved_locations'][i]['country_name']
-                location_label = ctk.CTkLabel(self.list_of_saved, text=f"{location_text}")
-                location_label.grid(row=i, column=0, padx=40, pady=10, sticky='w')
+
+                location_label_frame = ctk.CTkFrame(self.list_of_saved, fg_color="transparent")
+                location_label_frame.grid(row=i, column=0, padx=40, pady=10, sticky='w')
+
+                location_label = ctk.CTkLabel(location_label_frame, text=f"{location_text}")
+                location_label.grid(row=0, column=0, padx=5, pady=5, sticky='w')
+                location_label.bind("<Enter>", lambda y, w=location_label: self.on_hover(w))
+                location_label.bind("<Leave>", lambda y, w=location_label: self.on_leave(w))
+                location_label.bind("<Button-1>", lambda y, w=location_label: self.on_select(w))
+
+
+    def on_hover(self, label):
+        label.configure(text_color="lightblue")
+
+    def on_leave(self, label):
+        label.configure(text_color="white")
+
+    def on_select(self, label):
+        return
 
 
 class SettingsView(ctk.CTkFrame):

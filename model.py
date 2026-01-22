@@ -20,7 +20,7 @@ class Model:
 
     def checkLocation(self, _location):
         location_name, country_name = _location.split(', ')
-        print(country_name)
+        #print(country_name)
         country_alpha2 = self.get_country_code(country_name)
 
         url = f'https://api.openweathermap.org/geo/1.0/direct?q={location_name},&limit={5}&appid={self.APIkey}'
@@ -35,8 +35,8 @@ class Model:
             data = response.json()
 
         lat = lon = 0
-        print(data)
-        print(country_alpha2)
+        #print(data)
+        #print(country_alpha2)
 
         # Verifying the correct Country/State that the city belongs to.
         # Then getting the Latitude and Longitude for that city
@@ -58,7 +58,7 @@ class Model:
         response = requests.get(url)
         data = response.json()
 
-        print(data)
+        # print(data)
 
         return data
 

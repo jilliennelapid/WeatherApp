@@ -10,6 +10,8 @@ class Controller:
         self.main_view = None
         self.stats_view = None
 
+        self.set_frames(self.view)
+
     # Connecting the Frame objects to allow updates
     def set_frames(self, view):
         self.main_view = view.frames[MainView]
@@ -20,16 +22,20 @@ class Controller:
             self.model.location = location
             lat, lon = self.model.checkLocation(location)
         except ValueError as error:
-            self.view.show_message(error)
+            self.main_view.show_message(error)
         else:
             results = self.model.getWeatherData(lat, lon)
 
-            self.view.set_weather(results)
-            self.view.set_temperature(results)
-            self.view.set_temp_min(results)
-            self.view.set_temp_max(results)
-            self.view.set_rain(results)
-            self.view.set_windSpeed(results)
-            self.view.set_humidity(results)
-            self.view.set_sunrise(results)
-            self.view.set_sunset(results)
+            #print(results)
+            self.view.show_frame(StatsView)
+
+            self.stats_view.set_location_name(location)
+            self.stats_view.set_weather(results)
+            self.stats_view.set_temperature(results)
+            self.stats_view.set_temp_min(results)
+            self.stats_view.set_temp_max(results)
+            self.stats_view.set_rain(results)
+            self.stats_view.set_windSpeed(results)
+            self.stats_view.set_humidity(results)
+            self.stats_view.set_sunrise(results)
+            self.stats_view.set_sunset(results)
