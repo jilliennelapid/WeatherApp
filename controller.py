@@ -1,6 +1,6 @@
 # The Controller acts as a liaison between the Model and the View,
 # receiving user input and deciding what to do with it.
-from view import MainView, StatsView
+from view import MainView, StatsView, SavedView, LoadView
 
 class Controller:
     def __init__(self, model, view):
@@ -9,6 +9,7 @@ class Controller:
 
         self.main_view = None
         self.stats_view = None
+        self.saved_view = None
 
         self.set_frames(self.view)
 
@@ -16,8 +17,9 @@ class Controller:
     def set_frames(self, view):
         self.main_view = view.frames[MainView]
         self.stats_view = view.frames[StatsView]
+        self.saved_view = view.frames[SavedView]
 
-    def load(self, location):
+    def load(self, location, origin):
         try:
             self.model.location = location
             lat, lon = self.model.checkLocation(location)
@@ -27,7 +29,7 @@ class Controller:
             results = self.model.getWeatherData(lat, lon)
 
             #print(results)
-            self.view.show_frame(StatsView)
+            self.view.show_frame(LoadView)
 
             self.stats_view.set_location_name(location)
             self.stats_view.set_weather(results)
@@ -39,3 +41,8 @@ class Controller:
             self.stats_view.set_humidity(results)
             self.stats_view.set_sunrise(results)
             self.stats_view.set_sunset(results)
+
+            self.stats_view.set_return_button(self.view, origin)
+
+            # Look for if a location is already saved here
+            self.view.show_frame(StatsView)
