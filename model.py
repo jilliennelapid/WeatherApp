@@ -52,13 +52,12 @@ class Model:
         return lat, lon
 
     def getWeatherData(self, _lat, _lon):
-        # units =
         url = f'https://api.openweathermap.org/data/2.5/weather?lat={_lat}&lon={_lon}&appid={self.APIkey}&units=imperial'
 
         response = requests.get(url)
         data = response.json()
 
-        # print(data)
+        print(data)
 
         return data
 

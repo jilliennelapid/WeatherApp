@@ -20,8 +20,10 @@ class App(ctk.CTk):
         view = View(self)
         controller = Controller(model, view)
 
-        view.grid(row=0, column=0, padx=10, pady=10)
         self.resizable(False, False)
+        self.geometry("700x320")
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
 
         View.set_controller(view, controller)
         Controller.set_frames(controller, view)

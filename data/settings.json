@@ -3,7 +3,8 @@
         "system_mode": 0,
         "night_mode": 1,
         "temp_units": "Fahrenheit",
-        "date_format": "MM/DD/YYYY",
+        "unit_sys": "Imperial",
+        "date_format": "DD/MM/YYYY",
         "time_format": "12-Hour"
     }
 }
